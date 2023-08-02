@@ -2,14 +2,20 @@ import {
   create,
   generateForgotPasswordLink,
   grantValid,
+  logOut,
   resendVerificationToken,
+  sendProfile,
+  signIn,
   updatePassword,
+  updateProfile,
   verifyEmail,
-} from "#/controllers/user";
-import { isValidPasswordResetToken } from "#/middlewares/auth";
+} from "#/controllers/auth";
+import { isValidPasswordResetToken, mustAuth } from "#/middlewares/auth";
+import fileParser, { RequestWithFiles } from "#/middlewares/fileParser";
 import { validate } from "#/middlewares/validator";
 import {
   CreateUserSchema,
+  SignInValidationSchema,
   TokenAndIDValidationSchema,
   UpdatePasswordSchema,
 } from "#/utils/validationSchema";
@@ -33,5 +39,11 @@ router.post(
   isValidPasswordResetToken,
   updatePassword
 );
+router.post("/sign-in", validate(SignInValidationSchema), signIn);
+router.get("/is-auth", mustAuth, sendProfile);
+
+router.post("/update-profile", mustAuth, fileParser, updateProfile);
+
+router.post("/logout", mustAuth, logOut);
 
 export default router;

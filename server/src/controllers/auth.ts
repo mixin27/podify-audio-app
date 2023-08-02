@@ -7,11 +7,15 @@ import {
 } from "#/mail/mail";
 import User from "#/models/user";
 import { CreateUser, VerifyEmailRequest } from "#/@types/user";
-import { generateToken } from "#/utils/helper";
+import { formatProfile, generateToken } from "#/utils/helper";
 import { RequestHandler } from "express";
 import { isValidObjectId } from "mongoose";
 import crypto from "crypto";
-import { PASSWORD_RESET_LINK } from "#/utils/variables";
+import { JWT_SECRET, PASSWORD_RESET_LINK } from "#/utils/variables";
+import jwt from "jsonwebtoken";
+import { RequestWithFiles } from "#/middlewares/fileParser";
+import cloudinary from "#/cloud";
+import formidable from "formidable";
 
 export const create: RequestHandler = async (req: CreateUser, res) => {
   const { name, email, password } = req.body;
@@ -136,4 +140,108 @@ export const updatePassword: RequestHandler = async (req, res) => {
   sendPasswordResetSuccessEmail({ name: user.name, email: user.email });
 
   res.json({ message: "Password reset successfully." });
+};
+
+export const signIn: RequestHandler = async (req, res) => {
+  const { password, email } = req.body;
+
+  const user = await User.findOne({
+    email,
+  });
+
+  if (!user) return res.status(403).json({ error: "Email/Password mismatch." });
+
+  // compare the password
+  const matched = await user.comparePassword(password);
+  if (!matched)
+    return res.status(403).json({ error: "Email/Password mismatch." });
+
+  // generate the token for later use
+  const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+    expiresIn: "1d",
+  });
+  user.tokens.push(token);
+  await user.save();
+
+  res.json({
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      verified: user.verified,
+      avatar: user.avatar?.url,
+      followers: user.followers.length,
+      followings: user.followings.length,
+    },
+    token,
+  });
+};
+
+export const updateProfile: RequestHandler = async (
+  req: RequestWithFiles,
+  res
+) => {
+  const { name } = req.body;
+  const avatar = req.files?.avatar as formidable.File[];
+
+  const user = await User.findById(req.user.id);
+  if (!user) throw new Error("Something went wrong, user not found.");
+
+  if (typeof name[0] !== "string")
+    return res.status(422).json({ error: "Invalid name." });
+  if (name[0].trim().length < 3)
+    return res.status(422).json({ error: "Invalid name." });
+
+  user.name = name[0];
+
+  if (avatar && avatar.length > 0) {
+    // if there is already an avatar file, remove that
+    if (user.avatar?.publicId) {
+      await cloudinary.uploader.destroy(user.avatar.publicId);
+    }
+
+    // upload new avatar file
+    try {
+      const { secure_url, public_id } = await cloudinary.uploader.upload(
+        avatar[0].filepath,
+        {
+          resource_type: "image",
+          width: 300,
+          height: 300,
+          crop: "thumb",
+          gravity: "face",
+        }
+      );
+
+      user.avatar = { url: secure_url, publicId: public_id };
+    } catch (error) {
+      return res.status(500).json({ error });
+    }
+  }
+
+  await user.save();
+
+  res.json({ user: formatProfile(user) });
+};
+
+export const sendProfile: RequestHandler = (req, res) => {
+  res.json({
+    user: req.user,
+  });
+};
+
+export const logOut: RequestHandler = async (req, res) => {
+  // /auth/logout?frommAll=true
+  const { fromAll } = req.query;
+  const token = req.token;
+  const user = await User.findById(req.user.id);
+  if (!user) throw new Error("Something went wrong, user not found.");
+
+  // logout from all
+  if (fromAll === "true") user.tokens = [];
+  else user.tokens = user.tokens.filter((t) => t !== token);
+
+  await user.save();
+
+  res.json({ success: true });
 };
