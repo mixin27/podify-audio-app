@@ -1,7 +1,7 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2023-08-03T07:33:12.935Z",
+  "__export_date": "2023-08-03T09:25:59.892Z",
   "__export_source": "insomnia.desktop.app:v2023.4.0",
   "resources": [
     {
@@ -525,6 +525,193 @@
         "prefix": "Bearer"
       },
       "metaSortKey": -1691047779712,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_93f12918e07743b6bd9185a39738b417",
+      "parentId": "fld_10cfbba4fe49452d9639e771c0ab7fb8",
+      "modified": 1691053864556,
+      "created": 1691049654112,
+      "url": "{{url}}/playlist/create",
+      "name": "Create New Playlist",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"title\": \"Playlist #11\",\n\t\"visibility\": \"public\"\n}"
+      },
+      "parameters": [],
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{token}}",
+        "prefix": "Bearer"
+      },
+      "metaSortKey": -1691049654112,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_10cfbba4fe49452d9639e771c0ab7fb8",
+      "parentId": "wrk_fb3aa044c0934683b4f53359a2a34e8e",
+      "modified": 1691049651555,
+      "created": 1691049651555,
+      "name": "Playlist",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1691049651555,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_985981371927444da149be34d8f6a675",
+      "parentId": "fld_10cfbba4fe49452d9639e771c0ab7fb8",
+      "modified": 1691050833641,
+      "created": 1691050283221,
+      "url": "{{url}}/playlist",
+      "name": "Update Playlist",
+      "description": "",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"title\": \"TGIF Songs\",\n\t\"id\": \"64cb5eef2fee39349e7497e0\",\n\t\"item\": \"64ca132f8df3cd797a483633\",\n\t\"visibility\": \"private\"\n}"
+      },
+      "parameters": [],
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{token}}",
+        "prefix": "Bearer"
+      },
+      "metaSortKey": -1691050283221,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_e940c9b1d23948baa81b66f80b46d5df",
+      "parentId": "fld_10cfbba4fe49452d9639e771c0ab7fb8",
+      "modified": 1691053169924,
+      "created": 1691052983350,
+      "url": "{{url}}/playlist",
+      "name": "Remove Playlist or Playlist Item",
+      "description": "",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [
+        {
+          "id": "pair_0ff02f911b124615be69d161afc693c5",
+          "name": "playlistId",
+          "value": "64cb5f862fee39349e7497e4",
+          "description": ""
+        },
+        {
+          "id": "pair_5e8fdeffcd1d4717a838769aff0fd149",
+          "name": "resId",
+          "value": "64ca132f8df3cd797a483633",
+          "description": "",
+          "disabled": true
+        },
+        {
+          "id": "pair_9970b4dffd4e487f8dd062bf59538280",
+          "name": "all",
+          "value": "yes",
+          "description": "",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{token}}",
+        "prefix": "Bearer"
+      },
+      "metaSortKey": -1691052983350,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_c0d6334a996042f4b736577efb5e035e",
+      "parentId": "fld_10cfbba4fe49452d9639e771c0ab7fb8",
+      "modified": 1691054051594,
+      "created": 1691053583102,
+      "url": "{{url}}/playlist/by-profile",
+      "name": "Get Playlist By Profile",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "id": "pair_289c62ded82d4c88b38fea2a008cd2ac",
+          "name": "pageNo",
+          "value": "0",
+          "description": ""
+        },
+        {
+          "id": "pair_e20581f0db544d5da236ec8ba3db262f",
+          "name": "limit",
+          "value": "5",
+          "description": ""
+        }
+      ],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{token}}",
+        "prefix": "Bearer"
+      },
+      "metaSortKey": -1691053583102,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_045bbf6627ee49c8ae3f2dbf540f2b30",
+      "parentId": "fld_10cfbba4fe49452d9639e771c0ab7fb8",
+      "modified": 1691054391351,
+      "created": 1691054356812,
+      "url": "{{url}}/playlist/64cb5eef2fee39349e7497e0",
+      "name": "Get Playlist Audios",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{token}}",
+        "prefix": "Bearer"
+      },
+      "metaSortKey": -1691054356812,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
