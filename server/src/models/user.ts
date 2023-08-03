@@ -1,5 +1,5 @@
 import { compare, hash } from "bcrypt";
-import { Model, ObjectId, Schema, model } from "mongoose";
+import { Model, ObjectId, Schema, model, models } from "mongoose";
 
 // interface
 export interface UserDocument {
@@ -81,4 +81,6 @@ userSchema.methods.comparePassword = async function (password) {
   return result;
 };
 
-export default model("User", userSchema) as Model<UserDocument, {}, Methods>;
+const User = models.User || model("User", userSchema);
+
+export default User as Model<UserDocument, {}, Methods>;
