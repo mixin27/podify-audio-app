@@ -3,6 +3,7 @@ import {
   PopulateFavoriteList,
   UpdatePlaylistRequest,
 } from "#/@types/audio";
+import { PaginationQuery } from "#/@types/misc";
 import Audio from "#/models/audio";
 import Playlist from "#/models/playlist";
 import { RequestHandler } from "express";
@@ -107,10 +108,7 @@ export const removePlaylist: RequestHandler = async (req, res) => {
 };
 
 export const getPlaylistByProfile: RequestHandler = async (req, res) => {
-  const { pageNo = "0", limit = "10" } = req.query as {
-    pageNo: string;
-    limit: string;
-  };
+  const { pageNo = "0", limit = "10" } = req.query as PaginationQuery;
 
   const data = await Playlist.find({
     owner: req.user.id,
