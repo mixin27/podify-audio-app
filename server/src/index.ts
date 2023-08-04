@@ -1,6 +1,8 @@
 import express from "express";
 import "dotenv/config";
+import "express-async-errors";
 import "#/db";
+
 import { PORT } from "#/utils/variables";
 import authRouter from "#/routers/auth";
 import audioRouter from "#/routers/audio";
@@ -9,6 +11,7 @@ import playlistRouter from "#/routers/playlist";
 import profileRouter from "#/routers/profile";
 import historyRouter from "#/routers/history";
 import "./utils/schedule";
+import { errorHandler } from "./middlewares/error";
 
 const app = express();
 
@@ -23,6 +26,8 @@ app.use("/favorite", favoriteRouter);
 app.use("/playlist", playlistRouter);
 app.use("/profile", profileRouter);
 app.use("/history", historyRouter);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`🚀 Podify server is listening on port ${PORT}`);

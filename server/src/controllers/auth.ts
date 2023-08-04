@@ -74,6 +74,9 @@ export const resendVerificationToken: RequestHandler = async (req, res) => {
   const user = await User.findById(userId);
   if (!user) return res.status(403).json({ error: "Invalid request" });
 
+  if (user.verified)
+    return res.status(422).json({ error: "Your account is already verified" });
+
   await EmailVerificationToken.findOneAndDelete({
     owner: userId,
   });
