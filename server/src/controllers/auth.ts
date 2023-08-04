@@ -20,6 +20,10 @@ import formidable from "formidable";
 export const create: RequestHandler = async (req: CreateUser, res) => {
   const { name, email, password } = req.body;
 
+  const oldUser = await User.findOne({ email });
+  if (oldUser)
+    return res.status(403).json({ error: "Email is already in used." });
+
   const createdUser = await User.create({ name, email, password });
 
   // send verification email
