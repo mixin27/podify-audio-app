@@ -15,6 +15,7 @@ module.exports = {
           src: './src',
         },
       },
+      ['react-native-reanimated/plugin', {relativeSourceLocation: true}],
     ],
   ],
 };

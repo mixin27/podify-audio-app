@@ -1,0 +1,23 @@
+{
+  "RN TS Function Component": {
+    "prefix": "rntsfc",
+    "body": [
+      "import {FC} from 'react';",
+      "import {StyleSheet, View} from 'react-native';",
+      "",
+      "interface Props {}",
+      "",
+      "const $1: FC<Props> = props => {",
+      "  return <View style={styles.container}></View>;",
+      "};",
+      "",
+      "const styles = StyleSheet.create({",
+      "  container: {},",
+      "});",
+      "",
+      "export default $1;",
+      ""
+    ],
+    "description": "It will create react native and typescript functional component."
+  }
+}

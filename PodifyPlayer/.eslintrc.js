@@ -7,5 +7,6 @@ module.exports = {
     'prettier/prettier': ['error', {endOfLine: 'auto'}],
     'react/react-in-jsx-scope': 'off',
     'react/self-closing-comp': 'off',
+    'react-native/no-inline-styles': 'off',
   },
 };
