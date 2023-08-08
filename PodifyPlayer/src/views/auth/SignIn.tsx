@@ -5,11 +5,14 @@ import SubmitButton from '@components/form/SubmitButton';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import AppLink from '@ui/AppLink';
 import PasswordVisibilityIcon from '@ui/PasswordVisibilityIcon';
+import {Keys, saveToAsyncStorage} from '@utils/asyncStorage';
 import {FormikHelpers} from 'formik';
 import {FC, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
+import {useDispatch} from 'react-redux';
 import {AuthStackParamList} from 'src/@types/navigation';
 import client from 'src/api/client';
+import {updateLoggedInState, updateProfile} from 'src/store/auth';
 import * as yup from 'yup';
 
 const signInSchema = yup.object({
@@ -39,6 +42,7 @@ const initialValues = {
 
 const SignIn: FC<Props> = props => {
   const navigator = useNavigation<NavigationProp<AuthStackParamList>>();
+  const dispatch = useDispatch();
 
   const [secureEntry, setSecureEntry] = useState(true);
 
@@ -55,9 +59,11 @@ const SignIn: FC<Props> = props => {
       const {data} = await client.post('/auth/sign-in', {
         ...values,
       });
-      console.log(data);
 
-      // navigator.navigate('Home');
+      await saveToAsyncStorage(Keys.AUTH_TOKEN, data.token);
+
+      dispatch(updateProfile(data.user));
+      dispatch(updateLoggedInState(true));
     } catch (err) {
       console.log('Sign in error: ', err);
     }
