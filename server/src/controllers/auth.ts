@@ -48,7 +48,6 @@ export const verifyEmail: RequestHandler = async (
   res
 ) => {
   const { token, userId } = req.body;
-  // console.log(userId);
 
   const verificationToken = await EmailVerificationToken.findOne({
     owner: userId,

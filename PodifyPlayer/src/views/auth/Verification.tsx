@@ -1,17 +1,29 @@
 import {FC, useEffect, useRef, useState} from 'react';
-import {Keyboard, StyleSheet, TextInput, View} from 'react-native';
+import {Keyboard, StyleSheet, Text, TextInput, View} from 'react-native';
 import AppLink from '@ui/AppLink';
 import AuthFormContainer from '@components/AuthFormContainer';
-import OTPField from '@ui/OTPField';
 import AppButton from '@ui/AppButton';
+import OtpField from '@ui/OtpField';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {AuthStackParamList} from 'src/@types/navigation';
+import client from 'src/api/client';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import colors from '@utils/colors';
 
-interface Props {}
+type Props = NativeStackScreenProps<AuthStackParamList, 'Verification'>;
 
 const otpFields = new Array(6).fill('');
 
 const Verification: FC<Props> = props => {
+  const navigator = useNavigation<NavigationProp<AuthStackParamList>>();
+
   const [otp, setOtp] = useState([...otpFields]);
   const [activeOtpIndex, setActiveOtpIndex] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [countDown, setCounDown] = useState(60);
+  const [canSendNewOtpReq, setCanSendNewOtpReq] = useState(false);
+
+  const {userInfo} = props.route.params;
 
   const inputRef = useRef<TextInput>(null);
 
@@ -41,20 +53,72 @@ const Verification: FC<Props> = props => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log(otp);
+  const isValidOtp = otp.every(value => {
+    return value.trim();
+  });
+
+  const handleSubmit = async () => {
+    if (!isValidOtp) return;
+
+    setSubmitting(true);
+    try {
+      const {data} = await client.post('/auth/verify-email', {
+        userId: userInfo.id,
+        token: otp.join(''),
+      });
+
+      // navigate back to SignIn page
+      navigator.navigate('SignIn');
+    } catch (err) {
+      console.log('Email verify error: ', err);
+    }
+    setSubmitting(false);
+  };
+
+  const requestForOtp = async () => {
+    setCounDown(60);
+    setCanSendNewOtpReq(false);
+
+    try {
+      const {data} = await client.post('/auth/re-verify-email', {
+        userId: userInfo.id,
+      });
+      console.log(data);
+    } catch (err) {
+      console.log('Requesting for new otp error: ', err);
+    }
   };
 
   useEffect(() => {
     inputRef.current?.focus();
   }, [activeOtpIndex]);
 
+  useEffect(() => {
+    if (canSendNewOtpReq) return;
+
+    const intervalId = setInterval(() => {
+      setCounDown(oldCountDown => {
+        if (oldCountDown <= 0) {
+          setCanSendNewOtpReq(true);
+          clearInterval(intervalId);
+          return 0;
+        }
+
+        return oldCountDown - 1;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [canSendNewOtpReq]);
+
   return (
     <AuthFormContainer heading="Please look at your email.">
       <View style={styles.inputContainer}>
         {otpFields.map((_, index) => {
           return (
-            <OTPField
+            <OtpField
               ref={activeOtpIndex === index ? inputRef : null}
               key={index}
               placeholder="*"
@@ -69,10 +133,17 @@ const Verification: FC<Props> = props => {
         })}
       </View>
 
-      <AppButton title="Submit" onPressed={handleSubmit} />
+      <AppButton busy={submitting} title="Submit" onPressed={handleSubmit} />
 
       <View style={styles.linkContainer}>
-        <AppLink title="Re-send OTP" />
+        {countDown > 0 ? (
+          <Text style={styles.countDown}>{countDown} sec</Text>
+        ) : null}
+        <AppLink
+          active={canSendNewOtpReq}
+          title="Re-send OTP"
+          onPressed={requestForOtp}
+        />
       </View>
     </AuthFormContainer>
   );
@@ -89,7 +160,12 @@ const styles = StyleSheet.create({
   linkContainer: {
     marginTop: 20,
     width: '100%',
-    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+  },
+  countDown: {
+    color: colors.SECONDARY,
+    marginRight: 7,
   },
 });
 

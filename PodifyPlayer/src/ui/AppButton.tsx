@@ -1,16 +1,18 @@
 import colors from '@utils/colors';
 import {FC} from 'react';
 import {Pressable, StyleSheet, Text} from 'react-native';
+import Loader from './Loader';
 
 interface Props {
   title: string;
   onPressed?(): void;
+  busy?: boolean;
 }
 
-const AppButton: FC<Props> = ({title, onPressed}) => {
+const AppButton: FC<Props> = ({title, busy, onPressed}) => {
   return (
     <Pressable onPress={onPressed} style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+      {!busy ? <Text style={styles.title}>{title}</Text> : <Loader />}
     </Pressable>
   );
 };

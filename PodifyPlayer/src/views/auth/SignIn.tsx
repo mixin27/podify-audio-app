@@ -5,9 +5,11 @@ import SubmitButton from '@components/form/SubmitButton';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import AppLink from '@ui/AppLink';
 import PasswordVisibilityIcon from '@ui/PasswordVisibilityIcon';
+import {FormikHelpers} from 'formik';
 import {FC, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {AuthStackParamList} from 'src/@types/navigation';
+import client from 'src/api/client';
 import * as yup from 'yup';
 
 const signInSchema = yup.object({
@@ -25,6 +27,11 @@ const signInSchema = yup.object({
 
 interface Props {}
 
+interface SignInUserRequest {
+  email: string;
+  password: string;
+}
+
 const initialValues = {
   email: '',
   password: '',
@@ -39,11 +46,27 @@ const SignIn: FC<Props> = props => {
     setSecureEntry(!secureEntry);
   };
 
+  const handleSubmit = async (
+    values: SignInUserRequest,
+    actions: FormikHelpers<SignInUserRequest>,
+  ) => {
+    actions.setSubmitting(true);
+    try {
+      const {data} = await client.post('/auth/sign-in', {
+        ...values,
+      });
+      console.log(data);
+
+      // navigator.navigate('Home');
+    } catch (err) {
+      console.log('Sign in error: ', err);
+    }
+    actions.setSubmitting(false);
+  };
+
   return (
     <Form
-      onSubmit={values => {
-        console.log(values);
-      }}
+      onSubmit={handleSubmit}
       initialValues={initialValues}
       validationSchema={signInSchema}>
       <AuthFormContainer heading="Welcome back!">

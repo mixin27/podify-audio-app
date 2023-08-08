@@ -17,6 +17,8 @@ import AuthFormContainer from '@components/AuthFormContainer';
 import SubmitButton from '@components/form/SubmitButton';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthStackParamList} from 'src/@types/navigation';
+import {FormikHelpers} from 'formik';
+import client from 'src/api/client';
 
 const signupSchema = yup.object({
   name: yup
@@ -42,6 +44,12 @@ const signupSchema = yup.object({
 
 interface Props {}
 
+export interface NewUserRequest {
+  name: string;
+  email: string;
+  password: string;
+}
+
 const initialValues = {
   name: '',
   email: '',
@@ -57,11 +65,27 @@ const SignUp: FC<Props> = props => {
     setSecureEntry(!secureEntry);
   };
 
+  const handleSubmit = async (
+    values: NewUserRequest,
+    actions: FormikHelpers<NewUserRequest>,
+  ) => {
+    actions.setSubmitting(true);
+    try {
+      const {data} = await client.post('/auth/create', {
+        ...values,
+      });
+      console.log(data);
+
+      navigator.navigate('Verification', {userInfo: data.user});
+    } catch (err) {
+      console.log('Sign up error: ', err);
+    }
+    actions.setSubmitting(false);
+  };
+
   return (
     <Form
-      onSubmit={values => {
-        console.log(values);
-      }}
+      onSubmit={handleSubmit}
       initialValues={initialValues}
       validationSchema={signupSchema}>
       <AuthFormContainer
