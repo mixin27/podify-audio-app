@@ -62,8 +62,8 @@ export const createAudio: RequestHandler = async (
 
     res.status(201).json({
       audio: {
-        title,
-        about,
+        title: title[0],
+        about: about[0],
         file: createdAudio.file.url,
         poster: createdAudio.poster?.url,
       },

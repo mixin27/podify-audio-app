@@ -7,11 +7,19 @@ interface Props {
   title: string;
   onPressed?(): void;
   busy?: boolean;
+  borderRadius?: number;
 }
 
-const AppButton: FC<Props> = ({title, busy, onPressed}) => {
+const AppButton: FC<Props> = ({title, busy, onPressed, borderRadius}) => {
   return (
-    <Pressable onPress={onPressed} style={styles.container}>
+    <Pressable
+      onPress={onPressed}
+      style={[
+        styles.container,
+        {
+          borderRadius: borderRadius || 25,
+        },
+      ]}>
       {!busy ? <Text style={styles.title}>{title}</Text> : <Loader />}
     </Pressable>
   );
